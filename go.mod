@@ -1,4 +1,4 @@
-module github.com/taveman/xk6-mongo
+module github.com/taveman/xk6_mongo
 
 go 1.18
 
