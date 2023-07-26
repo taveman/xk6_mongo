@@ -1,4 +1,4 @@
-package main
+package xk6_mongo
 
 import (
 	"context"
