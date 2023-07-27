@@ -160,8 +160,8 @@ func (c *Client) DropCollection(database string, collection string) error {
 	return nil
 }
 
-func (c *Client) UpdateMany(database string, collection string, filter map[string]string, update map[string]string) (int64, int64) {
-	log.Printf("Delete collection if present")
+func (c *Client) UpdateMany(database string, collection string, filter interface{}, update interface{}) (int64, int64) {
+	log.Printf("Updating collection if present")
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 
