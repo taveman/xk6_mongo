@@ -159,3 +159,16 @@ func (c *Client) DropCollection(database string, collection string) error {
 	}
 	return nil
 }
+
+func (c *Client) UpdateMany(database string, collection string, filter map[string]string, update map[string]string) (int64, int64) {
+	log.Printf("Delete collection if present")
+	db := c.client.Database(database)
+	col := db.Collection(collection)
+
+	updateResult, err := col.UpdateMany(context.TODO(), filter, update)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return updateResult.MatchedCount, updateResult.ModifiedCount
+}
