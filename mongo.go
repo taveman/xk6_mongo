@@ -1,3 +1,5 @@
+package xk6_mongo
+
 import (
 	"context"
 	"log"
@@ -21,6 +23,16 @@ type Mongo struct{}
 // Client is the Mongo client wrapper.
 type Client struct {
 	client *mongo.Client
+}
+
+type Sort struct {
+	asc   bool
+	field string
+}
+
+type Options struct {
+	limit int64
+	sort  []Sort
 }
 
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
@@ -75,12 +87,31 @@ func (c *Client) Find(database string, collection string, filter interface{}) []
 	return results
 }
 
-func (c *Client) FindWithLimit(database string, collection string, filter interface{}, limit int64) []bson.M {
+func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts Options) []bson.M {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	log.Print(filter_is, filter)
+
 	options := options.Find()
-	options.SetLimit(limit)
+
+	// Setting up limits if filled
+	if opts.limit != 0 {
+		options.SetLimit(opts.limit)
+	}
+
+	// Setting up sort order is filled
+	if len(opts.sort) != 0 {
+		sortStruc := bson.D{}
+		for _, sort := range opts.sort {
+			if sort.asc {
+				sortStruc = append(sortStruc, bson.E{sort.field, 1})
+			} else {
+				sortStruc = append(sortStruc, bson.E{sort.field, -1})
+			}
+		}
+		options.SetSort(sortStruc)
+	}
+
 	cur, err := col.Find(context.TODO(), filter, options)
 	if err != nil {
 		log.Fatal(err)
