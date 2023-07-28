@@ -1,5 +1,3 @@
-package xk6_mongo
-
 import (
 	"context"
 	"log"
@@ -41,7 +39,7 @@ func (*Mongo) NewClient(connURI string) interface{} {
 
 const filter_is string = "filter is "
 
-func (c *Client) Insert(database string, collection string, doc map[string]string) error {
+func (c *Client) Insert(database string, collection string, doc interface{}) error {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	_, err := col.InsertOne(context.TODO(), doc)
@@ -94,7 +92,7 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	return results
 }
 
-func (c *Client) FindOne(database string, collection string, filter map[string]string) error {
+func (c *Client) FindOne(database string, collection string, filter interface{}) error {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	var result bson.M
@@ -123,7 +121,7 @@ func (c *Client) FindAll(database string, collection string) []bson.M {
 	return results
 }
 
-func (c *Client) DeleteOne(database string, collection string, filter map[string]string) error {
+func (c *Client) DeleteOne(database string, collection string, filter interface{}) error {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	opts := options.Delete().SetHint(bson.D{{"_id", 1}})
@@ -136,7 +134,7 @@ func (c *Client) DeleteOne(database string, collection string, filter map[string
 	return nil
 }
 
-func (c *Client) DeleteMany(database string, collection string, filter map[string]string) error {
+func (c *Client) DeleteMany(database string, collection string, filter interface{}) (int64, error) {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	opts := options.Delete().SetHint(bson.D{{"_id", 1}})
@@ -144,9 +142,10 @@ func (c *Client) DeleteMany(database string, collection string, filter map[strin
 	result, err := col.DeleteMany(context.TODO(), filter, opts)
 	if err != nil {
 		log.Fatal(err)
+		return -1, err
 	}
 	log.Printf("Deleted documents %v", result)
-	return nil
+	return result.DeletedCount, nil
 }
 
 func (c *Client) DropCollection(database string, collection string) error {
