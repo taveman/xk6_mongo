@@ -87,11 +87,12 @@ func (c *Client) Find(database string, collection string, filter interface{}) []
 	return results
 }
 
-func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts Options) []bson.M {
+func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts interface{}) []bson.M {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	log.Print(filter_is, filter)
-	log.Print("opts are ", opts)
+	optsStruct := opts.(Options)
+	log.Print("opts are ", optsStruct)
 
 	options := options.Find()
 
@@ -99,16 +100,16 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	// if opts.limit != 0 {
 
 	// }
-	options.SetLimit(opts.limit)
+	options.SetLimit(optsStruct.limit)
 
 	// Setting up sort order is filled
-	if len(opts.sort) != 0 {
+	if len(optsStruct.sort) != 0 {
 		sortStruc := bson.D{}
-		for _, sort := range opts.sort {
+		for _, sort := range optsStruct.sort {
 			if sort.asc {
-				sortStruc = append(sortStruc, bson.E{sort.field, 1})
+				sortStruc = append(sortStruc, bson.E{optsStruct.field, 1})
 			} else {
-				sortStruc = append(sortStruc, bson.E{sort.field, -1})
+				sortStruc = append(sortStruc, bson.E{optsStruct.field, -1})
 			}
 		}
 		options.SetSort(sortStruc)
