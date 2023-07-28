@@ -107,9 +107,9 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 		sortStruc := bson.D{}
 		for _, sort := range optsStruct.sort {
 			if sort.asc {
-				sortStruc = append(sortStruc, bson.E{optsStruct.field, 1})
+				sortStruc = append(sortStruc, bson.E{sort.field, 1})
 			} else {
-				sortStruc = append(sortStruc, bson.E{optsStruct.field, -1})
+				sortStruc = append(sortStruc, bson.E{sort.field, -1})
 			}
 		}
 		options.SetSort(sortStruc)
