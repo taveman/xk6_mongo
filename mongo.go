@@ -95,9 +95,10 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	options := options.Find()
 
 	// Setting up limits if filled
-	if opts.limit != 0 {
-		options.SetLimit(opts.limit)
-	}
+	// if opts.limit != 0 {
+
+	// }
+	options.SetLimit(opts.limit)
 
 	// Setting up sort order is filled
 	if len(opts.sort) != 0 {
