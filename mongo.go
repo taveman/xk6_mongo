@@ -91,6 +91,7 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	log.Print(filter_is, filter)
+	log.Printf("opts are %v", opts)
 
 	options := options.Find()
 
