@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/mitchellh/mapstructure"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -26,13 +27,13 @@ type Client struct {
 }
 
 type Sort struct {
-	asc   bool
-	field string
+	Asc   bool
+	Field string
 }
 
 type Options struct {
-	limit int64
-	sort  []Sort
+	Limit int64
+	Sort  []Sort
 }
 
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
@@ -87,29 +88,44 @@ func (c *Client) Find(database string, collection string, filter interface{}) []
 	return results
 }
 
-func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts interface{}) []bson.M {
+func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts map[string]interface{}) []bson.M {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	log.Print(filter_is, filter)
-	optsStruct := opts.(Options)
+	log.Print("opts ", opts)
+
+	var optsStruct Options
+	config := &mapstructure.DecoderConfig{
+		ErrorUnused: true,
+		Result:      &optsStruct,
+	}
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	if err := decoder.Decode(opts); err != nil {
+		log.Fatal(err)
+		return nil
+	}
+
 	log.Print("opts are ", optsStruct)
 
 	options := options.Find()
 
 	// Setting up limits if filled
-	// if opts.limit != 0 {
-
-	// }
-	options.SetLimit(optsStruct.limit)
+	if optsStruct.Limit != 0 {
+		options.SetLimit(optsStruct.Limit)
+	}
 
 	// Setting up sort order is filled
-	if len(optsStruct.sort) != 0 {
+	if len(optsStruct.Sort) != 0 {
 		sortStruc := bson.D{}
-		for _, sort := range optsStruct.sort {
-			if sort.asc {
-				sortStruc = append(sortStruc, bson.E{sort.field, 1})
+		for _, sort := range optsStruct.Sort {
+			if sort.Asc {
+				sortStruc = append(sortStruc, bson.E{sort.Field, 1})
 			} else {
-				sortStruc = append(sortStruc, bson.E{sort.field, -1})
+				sortStruc = append(sortStruc, bson.E{sort.Field, -1})
 			}
 		}
 		options.SetSort(sortStruc)
