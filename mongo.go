@@ -221,3 +221,10 @@ func (c *Client) UpdateMany(database string, collection string, filter interface
 	}
 	return updateResult.MatchedCount, updateResult.ModifiedCount
 }
+
+func (c *Client) Diconnect() {
+	log.Printf("Dicsonnecting from Mongo database")
+	if err := c.client.Disconnect(context.TODO()); err != nil {
+		panic(err)
+	}
+}
