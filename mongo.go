@@ -131,6 +131,11 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 		options.SetSort(sortStruc)
 	}
 
+	filter, err = bson.Marshal(filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	cur, err := col.Find(context.TODO(), filter, options)
 	if err != nil {
 		log.Fatal(err)
