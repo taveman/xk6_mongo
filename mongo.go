@@ -3,6 +3,7 @@ package xk6_mongo
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"go.mongodb.org/mongo-driver/bson"
@@ -89,6 +90,7 @@ func (c *Client) Find(database string, collection string, filter interface{}) []
 }
 
 func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts map[string]interface{}) []bson.M {
+	start := time.Now()
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	log.Print(filter_is, filter)
@@ -131,12 +133,12 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 		options.SetSort(sortStruc)
 	}
 
-	filter, err = bson.Marshal(filter)
+	marchaled_filter, err := bson.Marshal(filter)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	cur, err := col.Find(context.TODO(), filter, options)
+	cur, err := col.Find(context.TODO(), marchaled_filter, options)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -144,6 +146,10 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	if err = cur.All(context.TODO(), &results); err != nil {
 		panic(err)
 	}
+
+	t := time.Now()
+	elapsed := t.Sub(start)
+	log.Print("FindWithLimit took ", elapsed, " for filter ", filter)
 	return results
 }
 
