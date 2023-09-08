@@ -142,10 +142,15 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	if err != nil {
 		log.Fatal(err)
 	}
-	// var results []bson.M
+
+	t := time.Now()
+	elapsed := t.Sub(start)
+	log.Print("FindWithLimit getting cursor took ", elapsed, " for filter ", filter)
+
 	var list = make([]bson.M, 0)
 
 	for cur.Next(context.Background()) {
+		t_inner := time.Now()
 		var result bson.M
 		err = cur.Decode(&result)
 
@@ -155,13 +160,17 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 		}
 
 		list = append(list, result)
+		elapsed_inner := time.Now()
+		elapsed_inner_e := elapsed_inner.Sub(t_inner)
+		log.Print("FindWithLimit reading cursor took ", elapsed_inner_e, " for filter ", filter)
+
 	}
 	if err := cur.Err(); err != nil {
 		return nil
 	}
 
-	t := time.Now()
-	elapsed := t.Sub(start)
+	t = time.Now()
+	elapsed = t.Sub(start)
 	log.Print("FindWithLimit took ", elapsed, " for filter ", filter)
 	return list
 }
