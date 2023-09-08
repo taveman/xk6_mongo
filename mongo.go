@@ -142,15 +142,28 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	if err != nil {
 		log.Fatal(err)
 	}
-	var results []bson.M
-	if err = cur.All(context.TODO(), &results); err != nil {
-		panic(err)
+	// var results []bson.M
+	var list = make([]bson.M, 0)
+
+	for cur.Next(context.Background()) {
+		var result bson.M
+		err = cur.Decode(&result)
+
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+
+		list = append(list, result)
+	}
+	if err := cur.Err(); err != nil {
+		return nil
 	}
 
 	t := time.Now()
 	elapsed := t.Sub(start)
 	log.Print("FindWithLimit took ", elapsed, " for filter ", filter)
-	return results
+	return list
 }
 
 func (c *Client) FindOne(database string, collection string, filter interface{}) error {
