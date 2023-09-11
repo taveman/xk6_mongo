@@ -89,7 +89,7 @@ func (c *Client) Find(database string, collection string, filter interface{}) []
 	return results
 }
 
-func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts map[string]interface{}, fields interface{}) []bson.M {
+func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts interface{}, fields interface{}) []bson.M {
 	start := time.Now()
 	db := c.client.Database(database)
 	col := db.Collection(collection)
