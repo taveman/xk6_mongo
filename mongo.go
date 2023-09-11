@@ -34,7 +34,7 @@ type Sort struct {
 
 type Field struct {
 	Name string
-	Add  bool
+	Add  int
 }
 
 type Options struct {
