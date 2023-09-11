@@ -32,10 +32,15 @@ type Sort struct {
 	Field string
 }
 
+type Field struct {
+	Name string
+	Add  bool
+}
+
 type Options struct {
 	Limit  int64
 	Sort   []Sort
-	Fields map[string]int
+	Fields []Field
 }
 
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
@@ -135,7 +140,12 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	}
 
 	if len(optsStruct.Fields) != 0 {
-		options.SetProjection(optsStruct.Fields)
+		fieldsStruc := bson.D{}
+		for _, field := range optsStruct.Fields {
+			fieldsStruc = append(fieldsStruc, bson.E{field.Name, field.Add})
+
+		}
+		options.SetProjection(fieldsStruc)
 	}
 
 	marchaled_filter, err := bson.Marshal(filter)
