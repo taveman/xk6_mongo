@@ -155,11 +155,12 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 
 	t := time.Now()
 	elapsed := t.Sub(start)
-	log.Print("FindWithLimit getting cursor took ", elapsed, " for filter ", filter)
+	// log.Print("FindWithLimit getting cursor took ", elapsed, " for filter ", filter)
 
 	var list = make([]bson.M, 0)
 
-	for cur.Next(context.Background()) {
+	defer cur.Close(context.TODO())
+	for cur.Next(context.TODO()) {
 		// t_inner := time.Now()
 		var result bson.M
 		err = cur.Decode(&result)
