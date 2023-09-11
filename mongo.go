@@ -95,6 +95,7 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	col := db.Collection(collection)
 	log.Print(filter_is, filter)
 	log.Print("opts ", opts)
+	log.Print("Fields are ", fields)
 
 	var optsStruct Options
 	config := &mapstructure.DecoderConfig{
@@ -133,15 +134,7 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 		options.SetSort(sortStruc)
 	}
 
-	fi := fields.(map[string]int)
-
-	if len(fi) != 0 {
-		f := bson.D{}
-		for field, val := range fi {
-			f = append(f, bson.E{field, val})
-		}
-		options.SetProjection(f)
-	}
+	options.SetProjection(fields)
 
 	marchaled_filter, err := bson.Marshal(filter)
 	if err != nil {
