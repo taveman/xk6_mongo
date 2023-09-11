@@ -33,8 +33,9 @@ type Sort struct {
 }
 
 type Options struct {
-	Limit int64
-	Sort  []Sort
+	Limit  int64
+	Sort   []Sort
+	Fields map[string]int
 }
 
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
@@ -89,13 +90,12 @@ func (c *Client) Find(database string, collection string, filter interface{}) []
 	return results
 }
 
-func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts interface{}, fields interface{}) []bson.M {
+func (c *Client) FindWithLimit(database string, collection string, filter interface{}, opts interface{}) []bson.M {
 	start := time.Now()
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	log.Print(filter_is, filter)
 	log.Print("opts ", opts)
-	log.Print("Fields are ", fields)
 
 	var optsStruct Options
 	config := &mapstructure.DecoderConfig{
@@ -134,7 +134,9 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 		options.SetSort(sortStruc)
 	}
 
-	options.SetProjection(fields)
+	if len(optsStruct.Fields) != 0 {
+		options.SetProjection(optsStruct.Fields)
+	}
 
 	marchaled_filter, err := bson.Marshal(filter)
 	if err != nil {
@@ -148,13 +150,11 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 
 	t := time.Now()
 	elapsed := t.Sub(start)
-	// log.Print("FindWithLimit getting cursor took ", elapsed, " for filter ", filter)
 
 	var list = make([]bson.M, 0)
 
 	defer cur.Close(context.TODO())
 	for cur.Next(context.TODO()) {
-		// t_inner := time.Now()
 		var result bson.M
 		err = cur.Decode(&result)
 
@@ -164,10 +164,6 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 		}
 
 		list = append(list, result)
-		// elapsed_inner := time.Now()
-		// elapsed_inner_e := elapsed_inner.Sub(t_inner)
-		// log.Print("FindWithLimit reading cursor took ", elapsed_inner_e, " for filter ", filter)
-
 	}
 	if err := cur.Err(); err != nil {
 		return nil
