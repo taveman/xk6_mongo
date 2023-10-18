@@ -83,7 +83,7 @@ func (c *Client) InsertMany(database string, collection string, docs []any) erro
 func (c *Client) Find(database string, collection string, filter interface{}) []bson.M {
 	db := c.client.Database(database)
 	col := db.Collection(collection)
-	log.Print(filter_is, filter)
+	// log.Print(filter_is, filter)
 	cur, err := col.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal(err)
@@ -99,8 +99,8 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 	start := time.Now()
 	db := c.client.Database(database)
 	col := db.Collection(collection)
-	log.Print(filter_is, filter)
-	log.Print("opts ", opts)
+	// log.Print(filter_is, filter)
+	log.Print("[FindWithLimit] opts ", opts)
 
 	var optsStruct Options
 	config := &mapstructure.DecoderConfig{
@@ -190,7 +190,7 @@ func (c *Client) FindOne(database string, collection string, filter interface{})
 	col := db.Collection(collection)
 	var result bson.M
 	opts := options.FindOne().SetSort(bson.D{{"_id", 1}})
-	log.Print(filter_is, filter)
+	// log.Print(filter_is, filter)
 	err := col.FindOne(context.TODO(), filter, opts).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
@@ -218,7 +218,7 @@ func (c *Client) DeleteOne(database string, collection string, filter interface{
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	opts := options.Delete().SetHint(bson.D{{"_id", 1}})
-	log.Print(filter_is, filter)
+	// log.Print(filter_is, filter)
 	result, err := col.DeleteOne(context.TODO(), filter, opts)
 	if err != nil {
 		log.Fatal(err)
@@ -231,7 +231,7 @@ func (c *Client) DeleteMany(database string, collection string, filter interface
 	db := c.client.Database(database)
 	col := db.Collection(collection)
 	opts := options.Delete().SetHint(bson.D{{"_id", 1}})
-	log.Print(filter_is, filter)
+	// log.Print(filter_is, filter)
 	result, err := col.DeleteMany(context.TODO(), filter, opts)
 	if err != nil {
 		log.Fatal(err)
