@@ -181,7 +181,7 @@ func (c *Client) FindWithLimit(database string, collection string, filter interf
 
 	t = time.Now()
 	elapsed = t.Sub(start)
-	log.Print("FindWithLimit took ", elapsed, " for filter ", filter)
+	log.Print("FindWithLimit took ", elapsed)
 	return list
 }
 
